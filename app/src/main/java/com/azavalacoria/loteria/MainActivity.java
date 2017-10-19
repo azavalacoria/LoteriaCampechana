@@ -4,8 +4,8 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.TextView;
 
@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
     private GridView gridView;
     private GridCardAdapter gridCardAdapter;
 
-    int turno = 0;
+    int position = 0;
     ArrayList<Integer> cards;
     ArrayList<Integer> playerCards;
     TextView textView;
@@ -34,18 +34,25 @@ public class MainActivity extends AppCompatActivity {
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (turno < cards.size()) {
-                    Integer integer = cards.get(turno);
+                if (position < cards.size()) {
+                    Integer integer = cards.get(position);
 
-                    turno++;
+                    position++;
                     if (playerCards.contains(integer)) {
-                        textView.setText("¡Lo tienes! En el turno: "+ (turno+1)+" y salió: " + integer.toString());
+                        textView.setText("¡Lo tienes! En el position: "+ position +" y salió: " + integer.toString());
 
                         int index = playerCards.indexOf(integer);
 
-                        gridView.getChildAt(index).setBackgroundColor(Color.RED);
+                        View v = gridCardAdapter.getView(index, gridView.getChildAt(index), null);
+
+                        if (v != null) {
+                            v.setBackgroundColor(Color.BLACK);
+
+                            TextView textView = (TextView) v.findViewById(R.id.grid_title);
+                            textView.setTextColor(Color.WHITE);
+                        }
                     } else {
-                        textView.setText("Estamos en el turno: "+ (turno+1)+" y salió: " + integer.toString());
+                        textView.setText("Estamos en el position: "+ position +" y salió: " + integer.toString());
                     }
                 }
                 //shuffleCards();
@@ -59,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
         gridCardAdapter = new GridCardAdapter(this.getApplicationContext(), playerCards);
         gridView.setAdapter(gridCardAdapter);
         Collections.shuffle(cards);
+        Log.e("GRID_COUNT", ""+ gridCardAdapter.getCount());
     }
 
     private void shuffleCards() {

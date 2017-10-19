@@ -6,24 +6,40 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.azavalacoria.loteria.MainActivity">
-    <TextView
-        android:id="@+id/actualCard"
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/app_name"
-        />
+        android:layout_height="match_parent">
+        <ScrollView
+            android:id="@+id/mainScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <TextView
+                    android:id="@+id/actualCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/app_name"
+                    />
 
-    <GridView
-        android:id="@+id/gridview"
-        android:paddingTop="25dp"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:columnWidth="70dp"
-        android:numColumns="5"
-        android:gravity="center">
+                <GridView
+                    android:id="@+id/gridview"
+                    android:layout_width="match_parent"
+                    android:layout_height="400dp"
+                    android:columnWidth="70dp"
+                    android:gravity="center"
+                    android:numColumns="5"
+                    android:paddingTop="25dp">
+                </GridView>
 
-    </GridView>
 
+
+
+            </RelativeLayout>
+        </ScrollView>
+    </RelativeLayout>
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/floatingActionButtonStart"
         android:layout_width="wrap_content"
@@ -37,5 +53,4 @@
         app:srcCompat="@mipmap/ic_shout"
         app:elevation="0dp"
         />
-
 </android.support.design.widget.CoordinatorLayout>
