@@ -1,17 +1,22 @@
 package com.azavalacoria.loteria;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.GridView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
@@ -35,27 +40,45 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (position < cards.size()) {
-                    Integer integer = cards.get(position);
-
+                    final Integer integer = cards.get(position);
                     position++;
                     if (playerCards.contains(integer)) {
-                        textView.setText("¡Lo tienes! En el position: "+ position +" y salió: " + integer.toString());
 
-                        int index = playerCards.indexOf(integer);
+                        changeGridCardAttribute(integer, Color.RED, Color.WHITE);
 
-                        View v = gridCardAdapter.getView(index, gridView.getChildAt(index), null);
+                        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                        builder.setTitle("¡Qué suerte!");
+                        builder.setMessage("\nLa ficha " +integer.toString() + " se encuentra en tu tablero. ¿Deseas agregarla?");
+                        builder.setPositiveButton("Sí", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                changeGridCardAttribute(integer, Color.BLACK, Color.WHITE);
+                            }
+                        });
+                        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                changeGridCardAttribute(integer, Color.TRANSPARENT, Color.BLACK);
+                            }
+                        });
+                        Dialog dialog = builder.create();
+                        dialog.setCanceledOnTouchOutside(false);
 
-                        if (v != null) {
-                            v.setBackgroundColor(Color.BLACK);
+                        Window window = dialog.getWindow();
+                        window.getDecorView().findViewById(android.R.id.content).setForeground(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                        window.setNavigationBarColor(Color.TRANSPARENT);
 
-                            TextView textView = (TextView) v.findViewById(R.id.grid_title);
-                            textView.setTextColor(Color.WHITE);
-                        }
+                        WindowManager.LayoutParams layoutParams = window.getAttributes();
+                        layoutParams.gravity = Gravity.BOTTOM;
+                        layoutParams.flags &= ~WindowManager.LayoutParams.FLAG_DIM_BEHIND;
+
+                        window.setAttributes(layoutParams);
+
+                        dialog.show();
                     } else {
                         textView.setText("Estamos en el position: "+ position +" y salió: " + integer.toString());
                     }
                 }
-                //shuffleCards();
             }
         });
         createCards();
@@ -66,42 +89,16 @@ public class MainActivity extends AppCompatActivity {
         gridCardAdapter = new GridCardAdapter(this.getApplicationContext(), playerCards);
         gridView.setAdapter(gridCardAdapter);
         Collections.shuffle(cards);
-        Log.e("GRID_COUNT", ""+ gridCardAdapter.getCount());
     }
 
-    private void shuffleCards() {
-
-        createCards();
-        //cards = generateCards(90);
-        List<Integer> playerCards = new ArrayList<>(cards.subList(0, 25));
-        int equals = 0;
-        int asserted = 0;
-        int failed = 0;
-        Collections.shuffle(cards);
-        //createCards();
-        String string = "";
-        for (int i = 0; i < cards.size(); i++) {
-
-            if (playerCards.contains(cards.get(i))){
-                equals++;
-                asserted++;
-                playerCards.remove(playerCards.indexOf(cards.get(i)));
-                string = string + "Turno Asertado" + "\n";
-            } else {
-                failed++;
-                string = string + "Turno Fallado" + "\n";
-            }
-            /*
-            if (playerCards.get(i).equals(cards.get(i))) {
-                equals++;
-                string = string + (i + 1) + "\t .- " + cards.get(i).toString() + "\t-\t" + playerCards.get(i).toString()+ "<> \n";
-            } else {
-                string = string + (i + 1) + "\t .- " + cards.get(i).toString() + "\t-\t" + playerCards.get(i).toString()+ '\n';
-            }
-            */
+    private void changeGridCardAttribute(Integer integer, int background, int textColor) {
+        int index = playerCards.indexOf(integer);
+        View v = gridCardAdapter.getView(index, gridView.getChildAt(index), null);
+        if (v != null) {
+            v.setBackgroundColor(background);
+            TextView textView = (TextView) v.findViewById(R.id.grid_title);
+            textView.setTextColor(textColor);
         }
-
-        //setTitle("Iguales: " + equals);
     }
 
     private void createCards() {
